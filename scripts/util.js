@@ -32,6 +32,7 @@ function lockState(flag) {
   uploadBtn.toggleAttribute('disabled', flag);
   startBtn.toggleAttribute('disabled', flag);
   Array.from($('webhook-list').querySelectorAll('button')).forEach(x => x.toggleAttribute('disabled', flag));
+  Array.from($('webhook-list').querySelectorAll('div')).forEach(x => x.classList.toggle('disabled', flag));
 }
 
 function parseSize(bytes) {

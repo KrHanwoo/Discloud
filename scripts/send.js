@@ -40,7 +40,7 @@ async function parseFile(file) {
 }
 
 
-function sendFile(file, cid) {
+function sendFile(chunk, cid) {
   let progress = document.createElement('div');
   let info = document.createElement('span');
   let state = document.createElement('span');
@@ -53,11 +53,11 @@ function sendFile(file, cid) {
   progressBars.append(progress);
 
   let formData = new FormData();
-  formData.append('file', new Blob([file]), 'data');
+  formData.append('file', new Blob([chunk]), 'data');
 
   let xhr = new XMLHttpRequest();
   xhr.upload.onprogress = (ev) => {
-    let p = ev.loaded / file.byteLength;
+    let p = ev.loaded / chunk.byteLength;
     setProgress(cid, p);
     progress.style.setProperty('--progress', `${p * 100}%`);
     state.textContent = `${Math.floor(p * 100)}%`;
@@ -95,7 +95,7 @@ function sendFile(file, cid) {
       progress.style.height = 0;
       progress.style.opacity = 0;
       setTimeout(() => progress.remove(), 300);
-      sendFile(file, cid);
+      sendFile(chunk, cid);
     }, retryDelay);
   }
 }
@@ -113,7 +113,7 @@ async function startUpload() {
 }
 
 function resetUpload() {
-  webhookUsage = webhooks.map(x => [0, x]);
+  webhookUsage = webhooks.filter(x => x[1]).map(x => [0, x[0]]);
   result = [];
   progressBars.innerHTML = '';
   progressTop.innerHTML = '';

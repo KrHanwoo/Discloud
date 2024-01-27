@@ -15,12 +15,12 @@ webhookInput.oninput = () => {
     input.classList.remove('err');
     return;
   }
-  if (!WEBHOOK_REGEX.test(input.value) || webhooks.includes(input.value)) {
+  if (!WEBHOOK_REGEX.test(input.value) || webhooks.some(x => x[0] == input.value)) {
     input.classList.add('err');
   } else {
-    webhooks.push(input.value);
+    webhooks.push([input.value, true]);
     saveWebhooks();
-    appendWebhook(input.value);
+    appendWebhook([input.value, true]);
     input.value = '';
     input.classList.remove('err');
   }
@@ -28,7 +28,7 @@ webhookInput.oninput = () => {
 
 function appendWebhook(webhook, delay) {
   let div = document.createElement('div');
-  div.className = 'webhook';
+  div.classList.toggle('off', !webhook[1]);
 
   let info = document.createElement('div');
   let name = document.createElement('span');
@@ -39,7 +39,7 @@ function appendWebhook(webhook, delay) {
 
   let btn = document.createElement('button');
   btn.onclick = () => {
-    let idx = webhooks.indexOf(webhook);
+    let idx = webhooks.findIndex(x => x[0] == webhook[0]);
     if (idx != -1) webhooks.splice(idx, 1);
     div.remove();
     saveWebhooks();
@@ -48,13 +48,22 @@ function appendWebhook(webhook, delay) {
   btn.innerHTML = '&#xe15b;';
   div.append(info, btn);
 
+  div.onclick = () => {
+    if (locked) return;
+    let w = webhooks.filter(x => x[0] == webhook[0])?.[0];
+    if (!w) return;
+    w[1] = !w[1];
+    div.classList.toggle('off', !w[1]);
+    saveWebhooks();
+  };
+
   $('webhook-list').append(div);
 
   setTimeout(() => {
-    fetch(webhook).then(x => {
+    fetch(webhook[0]).then(x => {
       if (x.status == 401 || x.status == 404) {
         div.remove();
-        webhooks = webhooks.filter(w => w != webhook);
+        webhooks = webhooks.filter(w => w[0] != webhook[0]);
         saveWebhooks();
         return;
       }
@@ -74,7 +83,6 @@ function appendWebhook(webhook, delay) {
 function saveWebhooks() {
   localStorage.setItem('webhooks', JSON.stringify(webhooks));
 }
-
 
 function getWebhook() {
   let w = webhookUsage.sort((a, b) => a[0] - b[0])[0];

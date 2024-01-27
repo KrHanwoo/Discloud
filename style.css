@@ -151,27 +151,28 @@ button:disabled {
 }
 
 #webhook-list {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   overflow-y: auto;
-  padding-bottom: 1px;
+  background-color: #303030;
+  gap: 1px;
 
   &>div{
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: solid 1px rgb(48, 48, 48);
-    border-bottom: solid 1px rgb(48, 48, 48);
-    margin-bottom: -1px;
     padding: 3px 0;
     cursor: pointer;
+    background-color: black;
 
     &.off{
-      filter: brightness(0.5);
+      filter: brightness(0.3);
     }
 
-    &:disabled{
-      cursor: unset;
+    &.disabled{
+      cursor: unset !important;
     }
 
     &>div{
