@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <title>Discloud</title>
+  <script src="main.js" defer></script>
+  <script src="send.js" defer></script>
+</head>
+
+<body>
+  <div class="base flex-r">
+    <div class="webhooks flex-c">
+      <h1>WEBHOOKS</h1>
+      <input type="text" id="webhook-input" placeholder="Enter Webhook URL...">
+      <div id="webhook-list"></div>
+    </div>
+    <div class="sep-v"></div>
+    <div class="flex-c">
+      <div class="main flex-c">
+        <h1>DISCLOUD</h1>
+        <div class="flex-r h-auto main-options">
+          <div class="flex-c justify">
+            <span>control1</span>
+            <span>control2</span>
+            <span>control3</span>
+            <span>control4</span>
+          </div>
+          <div class="flex-c justify w-auto labels">
+            <span id="filename-label">filename</span>
+            <span id="filesize-label">size</span>
+            <span id="chunkcount-label">size</span>
+          </div>
+          <div class="flex-c justify w-auto">
+            <button id="upload-btn" class="btn">
+              <span class="material-symbols-outlined">&#xe9fc;</span>
+              <span class="t">SELECT</span>
+            </button>
+            <button id="start-btn" class="btn" disabled>
+              <span class="material-symbols-outlined">&#xf09b;</span>
+              <span class="t">UPLOAD</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="list"></div>
+      <div id="progress" class="flex-c">
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
+:root {
+  color: white;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555555;
+  width: 7px;
+  border-left: solid 5px black;
+}
+
+::-webkit-scrollbar {
+  background: black;
+  width: 10px;
+}
+
+* {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+html,
+body {
+  background: black;
+  height: 100%;
+  margin: 0;
+  padding: 3px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+h1 {
+  margin: 0px;
+  text-align: center;
+}
+
+input[type="text"] {
+  outline: none;
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #313131;
+  position: relative;
+  box-sizing: border-box;
+}
+
+button{
+  background: none;
+  outline: none;
+  border: none;
+}
+
+.base{
+  height: 100%;
+}
+
+.flex-c{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.flex-r{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sep-h{
+  height: 1px;
+  width: 100%;
+  background-color: rgb(51, 51, 51);
+  margin: 6px 0;
+}
+
+.sep-v{
+  width: 1px;
+  height: 100%;
+  background-color: rgb(51, 51, 51);
+  margin: 0 6px;
+}
+
+.justify{
+  justify-content: center;
+}
+
+.w-auto{
+  width: auto;
+}
+
+.h-auto{
+  height: auto;
+}
+
+.grid > div{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.webhooks {
+  gap: 5px;
+  height: 100%;
+  width: 30%;
+  max-width: 500px;
+}
+
+#webhook-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#webhook-list {
+  width: 100%;
+  overflow-y: auto;
+  padding-bottom: 1px;
+}
+
+.webhook {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: solid 1px rgb(48, 48, 48);
+  border-bottom: solid 1px rgb(48, 48, 48);
+  margin-bottom: -1px;
+  padding: 3px 0;
+}
+
+.webhook>div {
+  display: flex;
+  flex-direction: column;
+}
+
+.webhook>div>span:last-child {
+  color: gray;
+  font-size: 0.8em;
+}
+
+.webhook>button {
+  color: #d80000;
+  cursor: pointer;
+}
+
+.err {
+  border-color: #7e2029 !important;
+  border-width: 2px !important;
+}
+
+.t-err {
+  color: #d80000 !important;
+}
+
+.main-options{
+  gap: 10px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  margin-top: 10px;
+}
+
+.labels{
+  text-wrap: nowrap;
+}
+
+#filename-label{
+  text-wrap: nowrap;
+  max-width: 20vw;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#upload-btn{
+  background-color: #1b0083;
+  color: white;
+}
+
+.file{
+  display: flex;
+  flex-direction: row;
+}
+
+#start-btn{
+  background-color: #008602;
+  color: white;
+}
+
+.btn{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.btn:disabled{
+  cursor: unset;
+  filter: brightness(0.5);
+}
+
+#progress > div{
+  width: 100%;
+  height: 1.2rem;
+  background: linear-gradient(to right, white var(--progress), #1a1a1a var(--progress));
+  display: flex;
+  justify-content: space-between;
+
+  & > span{
+    mix-blend-mode: difference;
+  }
+
+  & > span:first-child{
+    margin-left: 10px;
+  }
+  
+  & > span:last-child{
+    margin-right: 10px;
+  }
+}
+
+#progress > div.idle{
+  background: #555555;
+}
+
+#progress > div.load{
+  background: #1b0083;
+}
+
+#progress > div.err{
+  background: #d80000;
+}
