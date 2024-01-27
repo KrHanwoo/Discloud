@@ -43,17 +43,54 @@ input[type="text"] {
   box-sizing: border-box;
 }
 
-button{
+button {
   background: none;
   outline: none;
   border: none;
 }
 
-.base{
+button:disabled {
+  cursor: unset !important;
+  filter: brightness(0.5);
+}
+
+.option {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+
+  &>* {
+    grid-column-start: 1;
+    grid-row-start: 1;
+  }
+
+  &>input {
+    width: 100%;
+    --value: 0%;
+    outline: none;
+    margin: 0;
+  }
+
+  &>input::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, white var(--value), #1a1a1a var(--value));
+    height: 100%;
+  }
+
+  &>input::-webkit-slider-thumb {
+    opacity: 0;
+  }
+
+  &>span {
+    mix-blend-mode: difference;
+    pointer-events: none;
+  }
+}
+
+.base {
   height: 100%;
 }
 
-.flex-c{
+.flex-c {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -61,7 +98,7 @@ button{
   height: 100%;
 }
 
-.flex-r{
+.flex-r {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -69,33 +106,33 @@ button{
   height: 100%;
 }
 
-.sep-h{
+.sep-h {
   height: 1px;
   width: 100%;
   background-color: rgb(51, 51, 51);
   margin: 6px 0;
 }
 
-.sep-v{
+.sep-v {
   width: 1px;
   height: 100%;
   background-color: rgb(51, 51, 51);
   margin: 0 6px;
 }
 
-.justify{
+.justify {
   justify-content: center;
 }
 
-.w-auto{
+.w-auto {
   width: auto;
 }
 
-.h-auto{
+.h-auto {
   height: auto;
 }
 
-.grid > div{
+.grid>div {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,32 +154,41 @@ button{
   width: 100%;
   overflow-y: auto;
   padding-bottom: 1px;
-}
 
-.webhook {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: solid 1px rgb(48, 48, 48);
-  border-bottom: solid 1px rgb(48, 48, 48);
-  margin-bottom: -1px;
-  padding: 3px 0;
-}
+  &>div{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: solid 1px rgb(48, 48, 48);
+    border-bottom: solid 1px rgb(48, 48, 48);
+    margin-bottom: -1px;
+    padding: 3px 0;
+    cursor: pointer;
 
-.webhook>div {
-  display: flex;
-  flex-direction: column;
-}
+    &.off{
+      filter: brightness(0.5);
+    }
 
-.webhook>div>span:last-child {
-  color: gray;
-  font-size: 0.8em;
-}
+    &:disabled{
+      cursor: unset;
+    }
 
-.webhook>button {
-  color: #d80000;
-  cursor: pointer;
+    &>div{
+      display: flex;
+      flex-direction: column;
+
+      &>span:last-child{
+        color: gray;
+        font-size: 0.8em;
+      }
+    }
+
+    &>button{
+      color: #d80000;
+      cursor: pointer;
+    }
+  }
 }
 
 .err {
@@ -154,78 +200,87 @@ button{
   color: #d80000 !important;
 }
 
-.main-options{
+.main-options {
   gap: 10px;
   padding: 0 20px;
   box-sizing: border-box;
   margin-top: 10px;
 }
 
-.labels{
+.main-btns {
+  justify-content: space-around;
+}
+
+.labels {
   text-wrap: nowrap;
 }
 
-#filename-label{
+#filename-label {
   text-wrap: nowrap;
   max-width: 20vw;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-#upload-btn{
+#upload-btn {
   background-color: #1b0083;
   color: white;
 }
 
-.file{
+.file {
   display: flex;
   flex-direction: row;
 }
 
-#start-btn{
+#start-btn {
   background-color: #008602;
   color: white;
 }
 
-.btn{
+.btn {
   display: flex;
   align-items: center;
   cursor: pointer;
 }
 
-.btn:disabled{
-  cursor: unset;
-  filter: brightness(0.5);
+#progress {
+  overflow-y: auto;
 }
 
-#progress > div{
+#progress>div,
+#progress-top>div {
   width: 100%;
   height: 1.2rem;
   background: linear-gradient(to right, white var(--progress), #1a1a1a var(--progress));
   display: flex;
   justify-content: space-between;
+  transition: height 0.3s ease-out;
 
-  & > span{
+  &>span {
     mix-blend-mode: difference;
   }
 
-  & > span:first-child{
+  &>span:first-child {
     margin-left: 10px;
   }
-  
-  & > span:last-child{
+
+  &>span:last-child {
     margin-right: 10px;
+  }
+
+  &.idle {
+    background: #555555;
+  }
+
+  &.load {
+    background: #1b0083;
+  }
+
+  &.err {
+    background: #d80000;
   }
 }
 
-#progress > div.idle{
-  background: #555555;
-}
-
-#progress > div.load{
-  background: #1b0083;
-}
-
-#progress > div.err{
-  background: #d80000;
+#progress-top {
+  margin-bottom: 10px;
 }

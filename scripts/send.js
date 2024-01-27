@@ -1,59 +1,17 @@
-const progressBars = $('progress');
-const uploadBtn = $('upload-btn');
-const startBtn = $('start-btn');
 const chunkSize = 20 * 1024 * 1024;
 
-let webhookUsage = [];
 let result = [];
 let totalProgress = [];
 let totalProgressBar;
 let totalProgressBarState;
+let totalProgressBarInfo;
+let startTime;
+let updateTimeTask;
 
-let limit = 10;
 let active = 0;
 
 let nextChunk;
-let file;
 let chunkCount;
-
-uploadBtn.onclick = async () => {
-  let iconElem = uploadBtn.firstElementChild;
-  let textElem = uploadBtn.lastElementChild;
-  if (file) {
-    file = null;
-    iconElem.innerHTML = '&#xe9fc;';
-    textElem.textContent = 'SELECT';
-    $('filename-label').textContent = '';
-    $('filesize-label').textContent = '';
-    $('chunkcount-label').textContent = '';
-    startBtn.toggleAttribute('disabled', true);
-    return;
-  }
-  const picker = document.createElement('input');
-  picker.type = 'file';
-  picker.oninput = (f) => {
-    file = f.target.files[0];
-    iconElem.innerHTML = '&#xf74f;';
-    textElem.textContent = 'REMOVE';
-    $('filename-label').textContent = file.name;
-    $('filesize-label').textContent = parseSize(file.size);
-    $('chunkcount-label').textContent = `${Math.ceil(file.size / chunkSize)} CHUNKS`;
-    startBtn.toggleAttribute('disabled', false);
-  };
-  picker.click();
-};
-
-$('start-btn').onclick = async () => {
-  lockState(true);
-  resetUpload();
-  nextChunk = await parseFile(file);
-  chunkCount = Math.ceil(file.size / chunkSize);
-  setupProgress();
-  for (let i = 0; i < limit; i++) {
-    await startUpload();
-    await new Promise((r) => setTimeout(r, 500));
-  }
-};
 
 
 async function parseFile(file) {
@@ -62,7 +20,7 @@ async function parseFile(file) {
   let cid = 0;
 
   return function chunk() {
-    if (offset >= fileSize) return null;
+    if (offset >= fileSize) return -1;
     return new Promise((resolve, reject) => {
       let r = new FileReader();
       let blob = file.slice(offset, chunkSize + offset);
@@ -114,12 +72,15 @@ function sendFile(file, cid) {
     progress.classList.remove('idle');
     state.textContent = '0%';
   };
-  xhr.onloadend = () => {
+  xhr.onloadend = async () => {
     if (xhr.status != 200) return err();
     result.push(xhr.response);
-    progress.remove();
+    progress.style.height = 0;
+    progress.style.opacity = 0;
+    setTimeout(() => progress.remove(), 300);
     active--;
-    if (active < limit) startUpload();
+    if (active < maxTasks) await startUpload();
+    setProgress(cid, 1);
   };
   xhr.onabort = err;
   xhr.open('POST', getWebhook());
@@ -131,15 +92,22 @@ function sendFile(file, cid) {
     progress.classList.add('err');
     setProgress(cid, 0);
     setTimeout(() => {
-      progress.remove();
+      progress.style.height = 0;
+      progress.style.opacity = 0;
+      setTimeout(() => progress.remove(), 300);
       sendFile(file, cid);
-    }, 3000);
+    }, retryDelay);
   }
 }
 
 async function startUpload() {
   let c = await nextChunk();
-  if (!c) return lockState(false);
+  if (c == -1) return;
+  if (!c) {
+    nextChunk = null;
+    lockState(false);
+    return;
+  }
   active++;
   sendFile(c[0], c[1]);
 }
@@ -148,26 +116,23 @@ function resetUpload() {
   webhookUsage = webhooks.map(x => [0, x]);
   result = [];
   progressBars.innerHTML = '';
+  progressTop.innerHTML = '';
   totalProgress = [];
+  clearInterval(updateTimeTask);
 }
 
-function getWebhook() {
-  let w = webhookUsage.sort((a, b) => a[0] - b[0])[0];
-  w[0]++;
-  return w[1];
-}
 
 function setupProgress() {
   totalProgressBar = document.createElement('div');
-  let info = document.createElement('span');
+  totalProgressBarInfo = document.createElement('span');
   totalProgressBarState = document.createElement('span');
 
-  info.textContent = 'TOTAL';
+  totalProgressBarInfo.textContent = 'TOTAL [0.0s]';
   totalProgressBarState.textContent = '0%';
-  totalProgressBar.append(info, totalProgressBarState);
+  totalProgressBar.append(totalProgressBarInfo, totalProgressBarState);
   totalProgressBar.style.setProperty('--progress', '0%');
   totalProgressBar.classList.add('total');
-  progressBars.append(totalProgressBar);
+  progressTop.append(totalProgressBar);
 }
 
 function setProgress(cid, progress) {
@@ -177,4 +142,15 @@ function setProgress(cid, progress) {
   let total = totalProgress.reduce((a, b) => a + b[1], 0);
   totalProgressBar.style.setProperty('--progress', `${total / chunkCount * 100}%`);
   totalProgressBarState.textContent = `${Math.floor(total / chunkCount * 100)}%`;
+
+  if (active == 0 && total == chunkCount) endUpload();
+}
+
+function updateProgressTime() {
+  totalProgressBarInfo.textContent = `TOTAL [${((Date.now() - startTime) / 1000).toFixed(1)}s]`;
+}
+
+function endUpload() {
+  clearInterval(updateTimeTask);
+  lockState(false);
 }

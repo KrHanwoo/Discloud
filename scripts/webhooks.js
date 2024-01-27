@@ -1,23 +1,16 @@
-const $ = id => document.getElementById(id);
-
 const WEBHOOK_REGEX = /^https:\/\/discord\.com\/api\/webhooks\/\d+\/[\w-]+$/;
 let webhooks = [];
+let webhookUsage = [];
 
 (async () => {
   webhooks = JSON.parse(localStorage.getItem('webhooks'));
   if (!webhooks) webhooks = [];
   let i = 0;
-  for (let w of webhooks) {
-    setTimeout(() => {
-      appendWebhook(w);
-      if (i + 1 >= webhooks.length) saveWebhooks();
-    }, i / 10 * 1000);
-    i++;
-  }
+  webhooks.forEach(w => appendWebhook(w, i++ * 50));
 })();
 
-$('webhook-input').oninput = (ev) => {
-  const input = ev.target;
+webhookInput.oninput = () => {
+  const input = webhookInput;
   if (!input.value) {
     input.classList.remove('err');
     return;
@@ -33,7 +26,7 @@ $('webhook-input').oninput = (ev) => {
   }
 }
 
-async function appendWebhook(webhook) {
+function appendWebhook(webhook, delay) {
   let div = document.createElement('div');
   div.className = 'webhook';
 
@@ -57,42 +50,34 @@ async function appendWebhook(webhook) {
 
   $('webhook-list').append(div);
 
-  await fetch(webhook).then(x => {
-    if (x.status == 401 || x.status == 404) {
-      div.remove();
-      webhooks = webhooks.filter(w => w != webhook);
-      saveWebhooks();
-      return;
-    }
-    if (!x.ok) throw new Error();
-    return x.json();
-  }).then(res => {
-    name.textContent = res.name;
-    desc.textContent = res.id;
-  }).catch(() => {
-    name.classList.add('t-err');
-    desc.textContent = 'ERROR';
-  });
+  setTimeout(() => {
+    fetch(webhook).then(x => {
+      if (x.status == 401 || x.status == 404) {
+        div.remove();
+        webhooks = webhooks.filter(w => w != webhook);
+        saveWebhooks();
+        return;
+      }
+      if (!x.ok) throw new Error();
+      return x.json();
+    }).then(res => {
+      name.textContent = res.name;
+      desc.textContent = res.id;
+    }).catch(() => {
+      name.classList.add('t-err');
+      desc.textContent = 'ERROR';
+    });
+  }, delay);
 }
 
-function lockState(flag) {
-  uploadBtn.toggleAttribute('disabled', flag);
-  startBtn.toggleAttribute('disabled', flag);
-}
 
 function saveWebhooks() {
   localStorage.setItem('webhooks', JSON.stringify(webhooks));
 }
 
-function parseSize(bytes) {
-  const thresh = 1024;
-  if (bytes < thresh) return `${bytes} B`;
-  const units = ['KB', 'MB', 'GB', 'TB'];
-  let u = -1;
-  const r = 10 ** 2;
-  do {
-    bytes /= thresh;
-    ++u;
-  } while (Math.round(bytes * r) / r >= thresh && u < units.length - 1);
-  return `${bytes.toFixed(2)} ${units[u]}`;
+
+function getWebhook() {
+  let w = webhookUsage.sort((a, b) => a[0] - b[0])[0];
+  w[0]++;
+  return w[1];
 }
