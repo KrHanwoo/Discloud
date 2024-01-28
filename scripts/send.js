@@ -70,7 +70,7 @@ function sendFile(chunk, cid) {
   progressBars.append(progress);
 
   let formData = new FormData();
-  formData.append('file', new Blob([chunk]), uuid);
+  formData.append('file', new Blob([chunk]), `${cid}_${uuid}`);
 
   let webhook = getWebhook();
   let xhr = new XMLHttpRequest();
@@ -92,7 +92,7 @@ function sendFile(chunk, cid) {
   };
   xhr.onloadend = async () => {
     if (xhr.status != 200) return err();
-    result.push([webhook, JSON.parse(xhr.response).id]);
+    result.push([webhook, JSON.parse(xhr.response).id, cid]);
     progress.style.height = 0;
     progress.style.opacity = 0;
     setTimeout(() => progress.remove(), 300);
@@ -177,15 +177,18 @@ function endUpload() {
 }
 
 function saveResult() {
-  let data = result.map(x => [x[0].replace('https://discord.com/api/webhooks/', ''), x[1]]).reduce((a, b) => {
-    (a[b[0]] = a[b[0]] || []).push(b[1]);
-    return a;
-  }, {});
+  const r = result.map(x => {
+    x[0] = x[0].replace('https://discord.com/api/webhooks/', '');
+    return x;
+  });
+  let webhookMap = r.map(x => x[0]);
+  let data = r.sort((a, b) => a[2] - b[2]).map(x => `${webhookMap.indexOf(x[0])}@${x[1]}`);
   let obj = {
     name: file.name,
     size: file.size,
     date: Date.now(),
     uuid: uuid,
+    webhooks: webhookMap,
     data: data
   };
   download(`${file.name}.disc`, JSON.stringify(obj, null, 2));

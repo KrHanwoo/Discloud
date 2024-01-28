@@ -10,6 +10,7 @@ const progressTop = $('progress-top');
 const uploadBtn = $('upload-btn');
 const startBtn = $('start-btn');
 const webhookInput = $('webhook-input');
+const mainOptions = $('main-options');
 
 registerSlider('delay-range', (v, elem) => {
   startDelay = v;
