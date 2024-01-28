@@ -134,7 +134,7 @@ document.ondrop = () => {
 };
 
 launchQueue.setConsumer(async (launchParams) => {
-  if(!launchParams.files) return;
+  if(!launchParams.files || !launchParams.files[0]?.getFile) return;
   let file = await launchParams.files[0].getFile();
   setDownloadFile(file);
 });

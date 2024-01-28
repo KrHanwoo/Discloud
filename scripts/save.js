@@ -35,8 +35,8 @@ function startGetInfo() {
 
 
 async function getInfo(data) {
-  let cid = Number(data.split('@')[0]) + 1;
-  let webhook = `https://discord.com/api/webhooks/${disc.webhooks[cid - 1]}`;
+  let cid = disc.data.indexOf(data) + 1;
+  let webhook = `https://discord.com/api/webhooks/${disc.webhooks[Number(data.split('@')[0])]}`;
   let msgId = data.split('@')[1];
 
   let progress = document.createElement('div');
@@ -142,6 +142,7 @@ async function getFile(cid, url) {
       progress.style.height = 0;
       progress.style.opacity = 0;
       setTimeout(() => progress.remove(), 300);
+      console.log('err');
       getFile(cid, url);
     }, downloadRetryDelay);
   }
@@ -154,7 +155,7 @@ function endDownload() {
 }
 
 function trySave() {
-  if(downloadedChunks.length != 0)return;
+  if (downloadedChunks.length != 0) return;
   writable.close();
 }
 
@@ -171,7 +172,7 @@ function resetDownload() {
 function startDownload() {
   if (lastCid >= chunkCount) return;
   if (active >= maxChunks) return;
-  if(urls.length == 0)return;
+  if (urls.length == 0) return;
   active++;
   let downloadUrl = urls.sort((a, b) => a[0] - b[0])[0];
   urls.splice(urls.indexOf(downloadUrl), 1);
