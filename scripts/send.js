@@ -137,6 +137,7 @@ function resetUpload() {
   progressBars.innerHTML = '';
   progressTop.innerHTML = '';
   totalProgress = [];
+  active = 0;
   clearInterval(updateTimeTask);
 }
 
@@ -154,7 +155,7 @@ function setupProgress() {
   progressTop.append(totalProgressBar);
 }
 
-function setProgress(cid, progress) {
+function setProgress(cid, progress, isDownload = false) {
   let p = totalProgress.filter(x => x[0] == cid);
   if (p.length == 0) totalProgress.push([cid, progress]);
   else p[0][1] = progress;
@@ -162,7 +163,9 @@ function setProgress(cid, progress) {
   totalProgressBar.style.setProperty('--progress', `${total / chunkCount * 100}%`);
   totalProgressBarState.textContent = `${Math.floor(total / chunkCount * 100)}%`;
 
-  if (active == 0 && total == chunkCount) endUpload();
+  if (!(active == 0 && total == chunkCount)) return;
+  if (isDownload) endDownload();
+  else endUpload();
 }
 
 function updateProgressTime() {
@@ -173,7 +176,6 @@ function endUpload() {
   clearInterval(updateTimeTask);
   lockState(false);
   saveResult();
-
 }
 
 function saveResult() {

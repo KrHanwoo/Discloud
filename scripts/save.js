@@ -1,9 +1,8 @@
 let activeFetch = 0;
-let picker;
+let writable;
 let urls = [];
 let dataIdx = 0;
 let lastCid = 0;
-let activeDownload = 0;
 let downloadedChunks = [];
 
 
@@ -14,18 +13,17 @@ async function showSavePrompt() {
 }
 
 startDownloadBtn.onclick = async () => {
-  picker = await showSavePrompt();
-  lockState(true);
   resetDownload();
+  writable = await showSavePrompt();
+  if (!writable) return;
+  writable = await writable.createWritable();
+  lockState(true);
   chunkCount = Math.ceil(disc.size / chunkSize);
   startTime = Date.now();
   setupProgress();
   updateTimeTask = setInterval(updateProgressTime, 100);
   for (let i = 0; i < maxFetch; i++) {
     startGetInfo();
-  }
-  for (let i = 0; i < maxChunks; i++) {
-    // await startUpload();
   }
 };
 
@@ -65,7 +63,7 @@ async function getInfo(data) {
       activeFetch--;
       if (activeFetch < maxFetch) startGetInfo();
       startDownload();
-      
+
       setTimeout(() => {
         progress.style.height = 0;
         progress.style.opacity = 0;
@@ -99,7 +97,7 @@ async function getFile(cid, url) {
   let xhr = new XMLHttpRequest();
   xhr.onprogress = (ev) => {
     let p = ev.loaded / ev.total;
-    setProgress(cid, p);
+    setProgress(cid, p, true);
     progress.style.setProperty('--progress', `${p * 100}%`);
     state.textContent = `${Math.floor(p * 100)}%`;
   };
@@ -108,28 +106,38 @@ async function getFile(cid, url) {
     state.textContent = '0%';
   };
   xhr.onloadend = async () => {
-    setProgress(cid, 1);
     progress.style.setProperty('--progress', '100%');
     progress.classList.add('load');
     state.textContent = 'LOAD';
 
     if (xhr.status != 200) return err();
-    downloadedChunks.push([cid, xhr.response]);
+    downloadedChunks.push([cid, new Uint8Array(xhr.response)]);
     progress.style.height = 0;
     progress.style.opacity = 0;
     setTimeout(() => progress.remove(), 300);
+    active--;
     startDownload();
-    setProgress(cid, 1);
+    writeToFile();
+    setProgress(cid, 1, true);
   };
   xhr.onabort = err;
   xhr.open('GET', url);
+  xhr.responseType = 'arraybuffer';
+
+  await new Promise(r => {
+    let interval = setInterval(() => {
+      if (lastCid + maxChunks < cid) return;
+      clearInterval(interval);
+      r();
+    }, 50);
+  });
   xhr.send();
 
   function err() {
     state.textContent = 'ERR';
     progress.classList.remove('load');
     progress.classList.add('err');
-    setProgress(cid, 0);
+    setProgress(cid, 0, true);
     setTimeout(() => {
       progress.style.height = 0;
       progress.style.opacity = 0;
@@ -139,23 +147,43 @@ async function getFile(cid, url) {
   }
 }
 
+function endDownload() {
+  clearInterval(updateTimeTask);
+  lockState(false);
+  trySave();
+}
+
+function trySave() {
+  if(downloadedChunks.length != 0)return;
+  writable.close();
+}
 
 function resetDownload() {
   activeFetch = 0;
-  picker = null;
+  writable = null;
   urls = [];
   dataIdx = 0;
-  activeDownload = 0;
   lastCid = 0;
   downloadedChunks = [];
   resetUpload();
 }
 
-function startDownload(){
+function startDownload() {
   if (lastCid >= chunkCount) return;
-  if(activeDownload >= maxChunks) return;
-  activeDownload ++;
-  let downloadUrl = urls.sort((a,b) => a[0] - b[0])[0];
+  if (active >= maxChunks) return;
+  if(urls.length == 0)return;
+  active++;
+  let downloadUrl = urls.sort((a, b) => a[0] - b[0])[0];
   urls.splice(urls.indexOf(downloadUrl), 1);
   getFile(downloadUrl[0], downloadUrl[1]);
+}
+
+function writeToFile() {
+  while (downloadedChunks.some(x => x[0] == lastCid + 1)) {
+    let c = downloadedChunks.findIndex(x => x[0] == lastCid + 1);
+    if (c == -1) return;
+    writable.write(downloadedChunks[c][1]);
+    downloadedChunks.splice(c, 1);
+    lastCid++;
+  }
 }

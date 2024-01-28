@@ -132,3 +132,9 @@ document.ondrop = () => {
   Array.from(downloadOptions.children).forEach(x => x.style.pointerEvents = null);
   Array.from(uploadOptions.children).forEach(x => x.style.pointerEvents = null);
 };
+
+launchQueue.setConsumer(async (launchParams) => {
+  if(!launchParams.files) return;
+  let file = await launchParams.files[0].getFile();
+  setDownloadFile(file);
+});
