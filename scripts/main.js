@@ -26,17 +26,3 @@ uploadBtn.onclick = async () => {
   };
   picker.click();
 };
-
-startBtn.onclick = async () => {
-  lockState(true);
-  resetUpload();
-  nextChunk = await parseFile(file);
-  chunkCount = Math.ceil(file.size / chunkSize);
-  startTime = Date.now();
-  setupProgress();
-  updateTimeTask = setInterval(updateProgressTime, 100);
-  for (let i = 0; i < maxTasks; i++) {
-    await startUpload();
-    await new Promise((r) => setTimeout(r, startDelay));
-  }
-};

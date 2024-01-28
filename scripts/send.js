@@ -13,6 +13,23 @@ let active = 0;
 let nextChunk;
 let chunkCount;
 
+let uuid;
+
+startBtn.onclick = async () => {
+  lockState(true);
+  resetUpload();
+  uuid = crypto.randomUUID();
+  nextChunk = await parseFile(file);
+  chunkCount = Math.ceil(file.size / chunkSize);
+  startTime = Date.now();
+  setupProgress();
+  updateTimeTask = setInterval(updateProgressTime, 100);
+  for (let i = 0; i < maxTasks; i++) {
+    await startUpload();
+    await new Promise((r) => setTimeout(r, startDelay));
+  }
+};
+
 
 async function parseFile(file) {
   let fileSize = file.size;
@@ -53,8 +70,9 @@ function sendFile(chunk, cid) {
   progressBars.append(progress);
 
   let formData = new FormData();
-  formData.append('file', new Blob([chunk]), 'data');
+  formData.append('file', new Blob([chunk]), uuid);
 
+  let webhook = getWebhook();
   let xhr = new XMLHttpRequest();
   xhr.upload.onprogress = (ev) => {
     let p = ev.loaded / chunk.byteLength;
@@ -74,7 +92,7 @@ function sendFile(chunk, cid) {
   };
   xhr.onloadend = async () => {
     if (xhr.status != 200) return err();
-    result.push(xhr.response);
+    result.push([webhook, JSON.parse(xhr.response).id]);
     progress.style.height = 0;
     progress.style.opacity = 0;
     setTimeout(() => progress.remove(), 300);
@@ -83,7 +101,7 @@ function sendFile(chunk, cid) {
     setProgress(cid, 1);
   };
   xhr.onabort = err;
-  xhr.open('POST', getWebhook());
+  xhr.open('POST', webhook);
   xhr.send(formData);
 
   function err() {
@@ -113,6 +131,7 @@ async function startUpload() {
 }
 
 function resetUpload() {
+  uuid = undefined;
   webhookUsage = webhooks.filter(x => x[1]).map(x => [0, x[0]]);
   result = [];
   progressBars.innerHTML = '';
@@ -153,4 +172,21 @@ function updateProgressTime() {
 function endUpload() {
   clearInterval(updateTimeTask);
   lockState(false);
+  saveResult();
+
+}
+
+function saveResult() {
+  let data = result.map(x => [x[0].replace('https://discord.com/api/webhooks/', ''), x[1]]).reduce((a, b) => {
+    (a[b[0]] = a[b[0]] || []).push(b[1]);
+    return a;
+  }, {});
+  let obj = {
+    name: file.name,
+    size: file.size,
+    date: Date.now(),
+    uuid: uuid,
+    data: data
+  };
+  download(`${file.name}.disc`, JSON.stringify(obj, null, 2));
 }
