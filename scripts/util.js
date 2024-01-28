@@ -60,7 +60,7 @@ function lockState(flag) {
   startDownloadBtn.toggleAttribute('disabled', flag);
   Array.from($('webhook-list').querySelectorAll('button')).forEach(x => x.toggleAttribute('disabled', flag));
   Array.from($('webhook-list').querySelectorAll('div')).forEach(x => x.classList.toggle('disabled', flag));
-  console.log(Array.from(document.querySelectorAll('input[type="range"]')));
+  Array.from(document.querySelectorAll('input[type="range"]')).forEach(x => x.toggleAttribute('disabled', flag));
 }
 
 function parseSize(bytes) {
@@ -92,6 +92,11 @@ function download(filename, text) {
   element.click();
 }
 
-function parseDisc(disc){
-
+async function parseDisc(disc) {
+  try {
+    let dec = decodeURIComponent(atob(await disc.text()));
+    return JSON.parse(dec);
+  } catch (e) {
+    return null;
+  }
 }

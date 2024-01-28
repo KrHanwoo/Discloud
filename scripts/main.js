@@ -1,4 +1,5 @@
 let file;
+let disc;
 
 uploadSelectBtn.onclick = async () => {
   let iconElem = uploadSelectBtn.firstElementChild;
@@ -95,15 +96,18 @@ downloadOptions.ondrop = (e) => {
   setDownloadFile(e.dataTransfer.files[0]);
 };
 
-function setDownloadFile(dragFile) {
+async function setDownloadFile(dragFile) {
   let iconElem = downloadSelectBtn.firstElementChild;
   let textElem = downloadSelectBtn.lastElementChild;
   file = dragFile;
+  let info = await parseDisc(file);
+  disc = info;
+  if(!info) return;
   iconElem.innerHTML = '&#xf74f;';
   textElem.textContent = 'REMOVE';
-  $('download-filename-label').textContent = file.name;
-  $('download-filesize-label').textContent = parseSize(file.size);
-  $('download-webhooks-label').textContent = `${Math.ceil(file.size / chunkSize)} CHUNKS`;
+  $('download-filename-label').textContent = info.name;
+  $('download-filesize-label').textContent = parseSize(info.size);
+  $('download-webhooks-label').textContent = `${info.webhooks.length} WEBHOOKS`;
   startDownloadBtn.toggleAttribute('disabled', false);
 }
 

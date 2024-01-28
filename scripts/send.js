@@ -181,7 +181,7 @@ function saveResult() {
     x[0] = x[0].replace('https://discord.com/api/webhooks/', '');
     return x;
   });
-  let webhookMap = r.map(x => x[0]);
+  let webhookMap = Array.from(new Set(r.map(x => x[0])));
   let data = r.sort((a, b) => a[2] - b[2]).map(x => `${webhookMap.indexOf(x[0])}@${x[1]}`);
   let obj = {
     name: file.name,
@@ -191,5 +191,5 @@ function saveResult() {
     webhooks: webhookMap,
     data: data
   };
-  download(`${file.name}.disc`, btoa(JSON.stringify(obj)));
+  download(`${file.name}.disc`, btoa(encodeURIComponent(JSON.stringify(obj))));
 }
