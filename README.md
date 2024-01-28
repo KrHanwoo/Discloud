@@ -5,6 +5,7 @@
 ```
 
 HKCU\.disc\OpenWithProgids\{KEYNAME}
+
 HKCU\{KEYNAME}\shell\open\command
 
 ```
