@@ -15,7 +15,7 @@ let chunkCount;
 
 let uuid;
 
-startBtn.onclick = async () => {
+startUploadBtn.onclick = async () => {
   lockState(true);
   resetUpload();
   uuid = crypto.randomUUID();
@@ -114,7 +114,7 @@ function sendFile(chunk, cid) {
       progress.style.opacity = 0;
       setTimeout(() => progress.remove(), 300);
       sendFile(chunk, cid);
-    }, retryDelay);
+    }, uploadRetryDelay);
   }
 }
 
@@ -191,5 +191,5 @@ function saveResult() {
     webhooks: webhookMap,
     data: data
   };
-  download(`${file.name}.disc`, JSON.stringify(obj, null, 2));
+  download(`${file.name}.disc`, btoa(JSON.stringify(obj)));
 }

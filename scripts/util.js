@@ -3,14 +3,23 @@ let locked = false;
 
 let startDelay = 500;
 let maxTasks = 3;
-let retryDelay = 3000;
+let uploadRetryDelay = 3000;
+
+let maxFetch = 5;
+let maxChunks = 3;
+let downloadRetryDelay = 3000;
 
 const progressBars = $('progress');
 const progressTop = $('progress-top');
-const uploadBtn = $('upload-btn');
-const startBtn = $('start-btn');
 const webhookInput = $('webhook-input');
-const mainOptions = $('main-options');
+
+const uploadSelectBtn = $('upload-select-btn');
+const startUploadBtn = $('start-upload-btn');
+const uploadOptions = $('upload-options');
+
+const downloadSelectBtn = $('download-select-btn');
+const startDownloadBtn = $('start-download-btn');
+const downloadOptions = $('download-options');
 
 registerSlider('delay-range', (v, elem) => {
   startDelay = v;
@@ -22,18 +31,36 @@ registerSlider('tasks-range', (v, elem) => {
   elem.textContent = `TASKS: ${v}`;
 });
 
-registerSlider('err-range', (v, elem) => {
-  retryDelay = v;
+registerSlider('upload-err-range', (v, elem) => {
+  uploadRetryDelay = v;
+  elem.textContent = `RETRY DELAY: ${(v / 1000).toFixed(1)}s`;
+});
+
+registerSlider('fetch-range', (v, elem) => {
+  maxFetch = v;
+  elem.textContent = `FETCH TASKS: ${v}`;
+});
+
+registerSlider('chunks-range', (v, elem) => {
+  maxChunks = v;
+  elem.textContent = `CACHED CHUNKS: ${v}`;
+});
+
+registerSlider('download-err-range', (v, elem) => {
+  downloadRetryDelay = v;
   elem.textContent = `RETRY DELAY: ${(v / 1000).toFixed(1)}s`;
 });
 
 function lockState(flag) {
   locked = flag;
   webhookInput.toggleAttribute('disabled', flag);
-  uploadBtn.toggleAttribute('disabled', flag);
-  startBtn.toggleAttribute('disabled', flag);
+  uploadSelectBtn.toggleAttribute('disabled', flag);
+  startUploadBtn.toggleAttribute('disabled', flag);
+  downloadSelectBtn.toggleAttribute('disabled', flag);
+  startDownloadBtn.toggleAttribute('disabled', flag);
   Array.from($('webhook-list').querySelectorAll('button')).forEach(x => x.toggleAttribute('disabled', flag));
   Array.from($('webhook-list').querySelectorAll('div')).forEach(x => x.classList.toggle('disabled', flag));
+  console.log(Array.from(document.querySelectorAll('input[type="range"]')));
 }
 
 function parseSize(bytes) {
@@ -63,4 +90,8 @@ function download(filename, text) {
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
   element.setAttribute('download', filename);
   element.click();
+}
+
+function parseDisc(disc){
+
 }

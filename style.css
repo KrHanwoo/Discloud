@@ -204,7 +204,13 @@ button:disabled {
   color: #d80000 !important;
 }
 
-#main-options {
+#upload-options {
+  gap: 10px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+#download-options {
   gap: 10px;
   padding: 0 20px;
   box-sizing: border-box;
@@ -221,7 +227,7 @@ button:disabled {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.main-btns {
+.justify-a {
   justify-content: space-around;
 }
 
@@ -236,25 +242,37 @@ button:disabled {
   overflow: hidden;
 }
 
-#upload-btn {
+#upload-select-btn {
   background-color: #1b0083;
   color: white;
 }
+
+#start-upload-btn {
+  background-color: #008602;
+  color: white;
+}
+
+#download-select-btn {
+  background-color: #1b0083;
+  color: white;
+}
+
+#start-download-btn {
+  background-color: #008602;
+  color: white;
+}
+
 
 .file {
   display: flex;
   flex-direction: row;
 }
 
-#start-btn {
-  background-color: #008602;
-  color: white;
-}
-
 .btn {
   display: flex;
   align-items: center;
   cursor: pointer;
+  width: 8em;
 }
 
 #progress {

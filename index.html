@@ -27,11 +27,12 @@
     </div>
     <div class="sep-v"></div>
     <div class="flex-c">
-      <div class="main flex-c">
-        <h1>DISCLOUD</h1>
+      <h1>DISCLOUD</h1>
+      <div class="sep-h"></div>
+      <div class="flex-c h-auto">
         <div class="overlap">
           <div class="drop"></div>
-          <div class="flex-r h-auto" id="main-options">
+          <div class="flex-r h-auto" id="upload-options">
             <div class="flex-c justify">
               <div class="option overlap">
                 <input type="range" name="delay" id="delay-range" min="0" max="10000" step="100" value="500">
@@ -42,23 +43,60 @@
                 <span></span>
               </div>
               <div class="option overlap">
-                <input type="range" name="err" id="err-range" min="0" max="10000" step="100" value="3000">
+                <input type="range" name="err" id="upload-err-range" min="0" max="10000" step="100" value="3000">
                 <span></span>
               </div>
             </div>
             <div class="flex-c justify w-auto labels">
-              <span id="filename-label"></span>
-              <span id="filesize-label"></span>
-              <span id="chunkcount-label"></span>
+              <span id="upload-filename-label"></span>
+              <span id="upload-filesize-label"></span>
+              <span id="upload-chunkcount-label"></span>
             </div>
-            <div class="flex-c justify w-auto main-btns">
-              <button id="upload-btn" class="btn">
+            <div class="flex-c justify-a w-auto">
+              <button id="upload-select-btn" class="btn">
                 <span class="material-symbols-outlined">&#xe9fc;</span>
                 <span class="t">SELECT</span>
               </button>
-              <button id="start-btn" class="btn" disabled>
+              <button id="start-upload-btn" class="btn" disabled>
                 <span class="material-symbols-outlined">&#xf09b;</span>
                 <span class="t">UPLOAD</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sep-h"></div>
+      <div class="flex-c h-auto">
+        <div class="overlap">
+          <div class="drop"></div>
+          <div class="flex-r h-auto" id="download-options">
+            <div class="flex-c justify">
+              <div class="option overlap">
+                <input type="range" name="fetch" id="fetch-range" min="1" max="50" step="1" value="5">
+                <span></span>
+              </div>
+              <div class="option overlap">
+                <input type="range" name="chunks" id="chunks-range" min="1" max="20" step="1" value="3">
+                <span></span>
+              </div>
+              <div class="option overlap">
+                <input type="range" name="err" id="download-err-range" min="0" max="10000" step="100" value="3000">
+                <span></span>
+              </div>
+            </div>
+            <div class="flex-c justify w-auto labels">
+              <span id="download-filename-label"></span>
+              <span id="download-filesize-label"></span>
+              <span id="download-webhooks-label"></span>
+            </div>
+            <div class="flex-c justify-a w-auto">
+              <button id="download-select-btn" class="btn">
+                <span class="material-symbols-outlined">&#xe9fc;</span>
+                <span class="t">SELECT</span>
+              </button>
+              <button id="start-download-btn" class="btn" disabled>
+                <span class="material-symbols-outlined">&#xf090;</span>
+                <span class="t">DOWNLOAD</span>
               </button>
             </div>
           </div>
