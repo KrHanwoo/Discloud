@@ -28,7 +28,22 @@
   ],
   "start_url": "/",
   "background_color": "#000000",
-  "display": "minimal-ui",
+  "display": "standalone",
   "scope": "/",
-  "theme_color": "#1b0083"
+  "theme_color": "#1b0083",
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "text/plain": ".disc"
+      },
+      "icons": [
+        {
+          "src": "icons/icon.ico",
+          "sizes": "any",
+          "type": "image/x-icon"
+        }
+      ]
+    }
+  ]
 }
