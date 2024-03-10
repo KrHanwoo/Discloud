@@ -24,7 +24,28 @@ webhookInput.oninput = () => {
     input.value = '';
     input.classList.remove('err');
   }
-}
+};
+
+webhookInput.onkeydown = (e) => {
+  if (e.key != 'Enter') return;
+  try {
+    let input = e.target.value;
+    let parsed = input.split('!')
+      .map(x => atob(x))
+      .map(x => x.split('!').map(x => atob(x)).join('/'))
+      .map(x => `https://discord.com/api/webhooks/${x}`);
+    parsed.forEach(x => {
+      if (webhooks.some(v => v[0] == x)) return;
+      webhooks.push([x, true]);
+      saveWebhooks();
+      appendWebhook([x, true]);
+    });
+    e.target.value = '';
+    e.target.classList.remove('err');
+  } catch {
+
+  }
+};
 
 function appendWebhook(webhook, delay) {
   let div = document.createElement('div');
